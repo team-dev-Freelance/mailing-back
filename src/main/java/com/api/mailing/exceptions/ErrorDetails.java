@@ -15,3 +15,4 @@ public class ErrorDetails {
         this.message = message;
     }
 }
+

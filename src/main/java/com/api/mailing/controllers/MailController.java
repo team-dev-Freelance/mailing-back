@@ -42,7 +42,7 @@ public class MailController {
 //        return new ResponseEntity<>(mailService.deleteAllById(idList), HttpStatus.OK);
 //    }
 
-    @DeleteMapping("/mail/deleteBoiteUser/{id}")
+    @PutMapping("/mail/deleteBoiteUser/{id}")
     public ResponseEntity<String> deleteBoiteUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.deleteAllMailUser(id), HttpStatus.OK);
     }

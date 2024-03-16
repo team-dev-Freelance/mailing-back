@@ -10,15 +10,10 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleMailNotFoundException(NotFoundException ex){
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MailNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleMailNotFoundException(MailNotFoundException ex){
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
 }

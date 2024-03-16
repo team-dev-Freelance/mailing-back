@@ -4,8 +4,7 @@ import com.api.mailing.dto.Encrypted;
 import com.api.mailing.dto.MailDto;
 import com.api.mailing.entities.Mail;
 import com.api.mailing.entities.Utilisateur;
-import com.api.mailing.exceptions.MailNotFoundException;
-import com.api.mailing.exceptions.UserNotFoundException;
+import com.api.mailing.exceptions.NotFoundException;
 import com.api.mailing.repositories.MailRepo;
 import com.api.mailing.repositories.UtilisateurRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +31,13 @@ public class MailService {
     public MailDto sendMail(Long id, Mail mail) throws Exception {
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
         if (utilisateur == null){
-            throw new UserNotFoundException("L'expediteur du mail est inconnu");
+            throw new NotFoundException("L'expediteur du mail est inconnu");
         }else if (utilisateur.getActive().equals(false)){
-            throw new UserNotFoundException("Utilisateur(expediteur) desactiver");
+            throw new NotFoundException("Utilisateur(expediteur) desactiver");
         }
         Utilisateur user = utilisateurRepo.findById(mail.getUtilisateur().getId()).orElse(null);
         if (user.getActive().equals(false)){
-            throw new UserNotFoundException("Utilisateur(destinataire) du mail est inconnu");
+            throw new NotFoundException("Utilisateur(destinataire) du mail est inconnu");
         }
         KeyPair keyPair = GeneratorKey.generateKeyPair();
         if (keyPair != null){
@@ -77,7 +76,7 @@ public class MailService {
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
 //        String password = "koire@0312";
         if (utilisateur == null){
-            throw new UserNotFoundException("Aucun compte avec l'id : " + id + "n'a ete trouve");
+            throw new NotFoundException("Aucun compte avec l'id : " + id + "n'a ete trouve");
         }
         List<MailDto> mailDtoList = new ArrayList<>();
         for (Mail mail : mailRepo.findAll()){
@@ -110,7 +109,7 @@ public class MailService {
 
     public String deleteMail(Long id) throws Exception {
         if (!mailRepo.existsById(id)) {
-            throw new MailNotFoundException("Aucun mail avec l'id : " + id + "n'a ete trouve");
+            throw new NotFoundException("Aucun mail avec l'id : " + id + "n'a ete trouve");
         }
         mailRepo.deleteById(id);
         throw new Exception("Mail supprimer");
@@ -118,7 +117,7 @@ public class MailService {
 
     public String deleteAllMailUser(Long id) throws Exception {
         if (!utilisateurRepo.existsById(id)){
-            throw new MailNotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
+            throw new NotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
         }
         List<MailDto> mailDtoList = boiteDeReception(id);
         List<Mail> mailList = new ArrayList<>();

@@ -2,7 +2,7 @@ package com.api.mailing.services;
 
 import com.api.mailing.dto.UtilisateurDto;
 import com.api.mailing.entities.Utilisateur;
-import com.api.mailing.exceptions.UserNotFoundException;
+import com.api.mailing.exceptions.NotFoundException;
 import com.api.mailing.repositories.UtilisateurRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class UtilisateurService {
 
     public UtilisateurDto addUser(Utilisateur utilisateur){
         if (utilisateur == null){
-            throw new UserNotFoundException("Veuillez remplir toutes les informations");
+            throw new NotFoundException("Veuillez remplir toutes les informations");
         }
         if (!EmailValidator.isValidEmail(utilisateur.getEmail())){
             throw new RuntimeException("L'adresse mail n'est pas valide");
@@ -42,7 +42,7 @@ public class UtilisateurService {
     public UtilisateurDto getById(Long id){
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
         if (utilisateur == null){
-            throw new UserNotFoundException("Aucun utilisateur avec l'id : " + id + " n'a ete trouve");
+            throw new NotFoundException("Aucun utilisateur avec l'id : " + id + " n'a ete trouve");
         }
         UtilisateurDto utilisateurDto = new UtilisateurDto();
         utilisateurDto.setId(utilisateur.getId());
@@ -68,7 +68,7 @@ public class UtilisateurService {
     public UtilisateurDto editUser(Long id, Utilisateur utilisateur){
         Utilisateur user = utilisateurRepo.findById(id).orElse(null);
         if (user == null) {
-            throw new UserNotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
+            throw new NotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
         }
         user.setEmail(utilisateur.getEmail());
         user.setUsername(utilisateur.getUsername());
@@ -84,7 +84,7 @@ public class UtilisateurService {
     public UtilisateurDto getByEmail(String email){
         Utilisateur utilisateur =  utilisateurRepo.findByEmail(email);
         if (utilisateur == null){
-            throw new UserNotFoundException("Aucun utilisateur avec l'email : " + email + "n'a ete trouve");
+            throw new NotFoundException("Aucun utilisateur avec l'email : " + email + "n'a ete trouve");
         }
 
         UtilisateurDto utilisateurDto = new UtilisateurDto();
@@ -132,7 +132,7 @@ public class UtilisateurService {
 
     public String deleteUser(Long id){
         if (!utilisateurRepo.existsById(id)) {
-            throw new UserNotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
+            throw new NotFoundException("Aucun utilisateur avec l'id : " + id + "n'a ete trouve");
         }
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
         utilisateur.setActive(false);
