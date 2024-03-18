@@ -22,17 +22,17 @@ public class MailController {
         this.mailService = mailService;
     }
 
-    @PostMapping("/mail/add/{id}")
+    @PostMapping("/add/{id}")
     public ResponseEntity<MailDto> sendMail(@PathVariable Long id, @RequestBody Mail mail) throws Exception {
         return new ResponseEntity<>(mailService.sendMail(id, mail), HttpStatus.OK);
     }
 
-    @GetMapping("/mail/boite/{id}")
+    @GetMapping("/boite/{id}")
     public ResponseEntity<List<MailDto>> getEmailListByUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.boiteDeReception(id), HttpStatus.OK);
     }
 
-    @DeleteMapping("/mail/deleteOneMail/{id}")
+    @DeleteMapping("/deleteOneMail/{id}")
     public ResponseEntity<String> deleteOneMail(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.deleteMail(id), HttpStatus.OK);
     }
@@ -42,7 +42,7 @@ public class MailController {
 //        return new ResponseEntity<>(mailService.deleteAllById(idList), HttpStatus.OK);
 //    }
 
-    @PutMapping("/mail/deleteBoiteUser/{id}")
+    @PutMapping("/deleteBoiteUser/{id}")
     public ResponseEntity<String> deleteBoiteUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.deleteAllMailUser(id), HttpStatus.OK);
     }

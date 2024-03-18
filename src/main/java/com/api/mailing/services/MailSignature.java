@@ -3,7 +3,6 @@ package com.api.mailing.services;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.util.Arrays;
 
 public class MailSignature {
 

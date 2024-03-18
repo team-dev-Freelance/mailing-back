@@ -22,28 +22,23 @@ public class UtilisateurController {
     public UtilisateurController(UtilisateurService utilisateurService) {
         this.utilisateurService = utilisateurService;
     }
-
-    @GetMapping()
-    public String login(){
-        return "connecter";
-    }
-
-    @PostMapping("/user/add")
+    
+    @PostMapping("/add")
     public ResponseEntity<UtilisateurDto> saveUser(@RequestBody Utilisateur utilisateur){
         return new ResponseEntity<>(utilisateurService.addUser(utilisateur), HttpStatus.OK);
     }
 
-    @GetMapping("/user/findAll")
+    @GetMapping("/findAll")
     public ResponseEntity<List<UtilisateurDto>> getAllUsers(){
         return new ResponseEntity<>(utilisateurService.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/user/findById/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<UtilisateurDto> getUserById(@PathVariable Long id){
         return new ResponseEntity<>(utilisateurService.getById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/user/findByEmail")
+    @GetMapping("/findByEmail")
     public ResponseEntity<UtilisateurDto> getUserByEmail(@RequestParam("email") String email){
         return new ResponseEntity<>(utilisateurService.getByEmail(email), HttpStatus.OK);
     }
@@ -53,12 +48,12 @@ public class UtilisateurController {
 //        return new ResponseEntity<>(utilisateurService.changePassword(id, password.getOldPassword(), password.getNewPassword()), HttpStatus.OK);
 //    }
 
-    @PutMapping("/user/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UtilisateurDto> updateUserById(@PathVariable Long id, @RequestBody Utilisateur utilisateur){
         return new ResponseEntity<>(utilisateurService.editUser(id, utilisateur), HttpStatus.OK);
     }
 
-    @PutMapping("/user/deleteUserById/{id}")
+    @PutMapping("/deleteUserById/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable Long id){
         return new ResponseEntity<>(utilisateurService.deleteUser(id), HttpStatus.OK);
     }
