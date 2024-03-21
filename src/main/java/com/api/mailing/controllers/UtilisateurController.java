@@ -22,11 +22,11 @@ public class UtilisateurController {
     public UtilisateurController(UtilisateurService utilisateurService) {
         this.utilisateurService = utilisateurService;
     }
-    
-    @PostMapping("/add")
-    public ResponseEntity<UtilisateurDto> saveUser(@RequestBody Utilisateur utilisateur){
-        return new ResponseEntity<>(utilisateurService.addUser(utilisateur), HttpStatus.OK);
-    }
+
+//    @PostMapping("/add")
+//    public ResponseEntity<UtilisateurDto> saveUser(@RequestBody Utilisateur utilisateur){
+//        return new ResponseEntity<>(utilisateurService.addUser(utilisateur), HttpStatus.OK);
+//    }
 
     @GetMapping("/findAll")
     public ResponseEntity<List<UtilisateurDto>> getAllUsers(){
@@ -43,10 +43,10 @@ public class UtilisateurController {
         return new ResponseEntity<>(utilisateurService.getByEmail(email), HttpStatus.OK);
     }
 
-//    @GetMapping("/user/changePassword/{id}")
-//    public ResponseEntity<String> changedPassword(@PathVariable Long id, @RequestBody Password password) throws Exception {
-//        return new ResponseEntity<>(utilisateurService.changePassword(id, password.getOldPassword(), password.getNewPassword()), HttpStatus.OK);
-//    }
+    @GetMapping("/user/changePassword/{id}")
+    public ResponseEntity<String> changedPassword(@PathVariable Long id, @RequestBody Password password) throws Exception {
+        return new ResponseEntity<>(utilisateurService.changePassword(id, password.getOldPassword(), password.getNewPassword()), HttpStatus.OK);
+    }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<UtilisateurDto> updateUserById(@PathVariable Long id, @RequestBody Utilisateur utilisateur){

@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/admin/mail")
+@RequestMapping("/api/v1/user/mail")
 public class MailController {
 
     private MailService mailService;
