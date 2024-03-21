@@ -55,7 +55,7 @@ public class AuthenticationService {
 
 //    System.out.println("request" + request);
     authenticationManager.authenticate(
-            
+
         new UsernamePasswordAuthenticationToken(
             request.getEmail(),
             request.getPassword()));
