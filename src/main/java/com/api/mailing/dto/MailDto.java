@@ -1,5 +1,6 @@
 package com.api.mailing.dto;
 
+import com.api.mailing.entities.STATUT;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ public class MailDto {
     private String emailExpediteur;
     private String object;
     private String content;
-    private Boolean openMail;
+    private STATUT statut;
     private List<String> urlsJointPieces;
     private Date date;
 }

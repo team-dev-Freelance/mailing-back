@@ -23,11 +23,11 @@ public class Mail implements Serializable {
     @Column
     private String objet;
 
+    @Column
+    private STATUT statut;
+
     @Column(length = 4096)
     private String content;
-
-    @Column
-    private Boolean openMail = false;
 
     @Column
     private String emailExpediteur;

@@ -3,6 +3,7 @@ package com.api.mailing.services;
 import com.api.mailing.dto.Encrypted;
 import com.api.mailing.dto.MailDto;
 import com.api.mailing.entities.Mail;
+import com.api.mailing.entities.STATUT;
 import com.api.mailing.entities.Utilisateur;
 import com.api.mailing.exceptions.NotFoundException;
 import com.api.mailing.repositories.MailRepo;
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +70,7 @@ public class MailService {
         mailDto.setObject(mail.getObjet());
         mailDto.setContent(mail.getContent());
         mailDto.setDate(mail.getDate());
-        mailDto.setOpenMail(mail.getOpenMail());
+        mailDto.setStatut(mail.getStatut());
         mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
         return mailDto;
     }
@@ -99,7 +102,7 @@ public class MailService {
                 mailDto.setContent(decryptedMessage);
                 mailDto.setDate(mail.getDate());
                 mailDto.setEmailExpediteur(mail.getEmailExpediteur());
-                mailDto.setOpenMail(mail.getOpenMail());
+                mailDto.setStatut(mail.getStatut());
                 mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
                 mailDtoList.add(mailDto);
             }
@@ -107,12 +110,74 @@ public class MailService {
         return mailDtoList;
     }
 
-    public String deleteMail(Long id) throws Exception {
+    public List<MailDto> getListMailByStatut(Long id, STATUT statut) throws Exception {
+        Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
+        if (utilisateur == null){
+            throw new NotFoundException("Aucun utilisateur pour l'id: "+id);
+        }
+        if (mailRepo.findAll().isEmpty()){
+            throw new NotFoundException("Aucun enregistrement dans la base de donnees");
+        }
+        if (boiteDeReception(id).isEmpty()){
+            throw new NotFoundException("Aucun enregistrement dans la base de donnees");
+        }
+        List<MailDto> mailDtoList = new ArrayList<>();
+        for (MailDto mailDto:  boiteDeReception(id)){
+            if (mailDto.getStatut().equals(statut)){
+                mailDtoList.add(mailDto);
+            }
+        }
+        if (mailDtoList.isEmpty()){
+            throw new NotFoundException("Aucun enregistrement dans la base de donnees");
+        }
+        return mailDtoList;
+    }
+
+    public MailDto editMail(Long id, Mail mail) throws Exception {
+        Mail mai = mailRepo.findById(id).orElse(null);
+        if (mai == null){
+            throw new NotFoundException("Aucun mail pour l'id: "+id);
+        }
+        String decryptedMessage = "";
+        PrivateKey privateKey = KeyEncryption.decryptPrivateKey(mai.getPrivateKey());
+        PublicKey publicKey = KeyEncryption.decryptPublicKey(mai.getPublicKey());
+        boolean isValid = MailSignature.verifySignature(mai.getContent(), mai.getSignature(), publicKey);
+        if (!isValid){
+            ChiffrementService chiffrementService = new ChiffrementService();
+            decryptedMessage = chiffrementService.decryptContent(mai.getContent(), mai.getSecretKey(), privateKey);
+        }else {
+            throw new Exception("Mail corrompu");
+        }
+        mai.setUrlJointPieces(mail.getUrlJointPieces());
+        mai.setSignature(mail.getSignature());
+        mai.setContent(mail.getContent());
+        mai.setDate(mail.getDate());
+        mai.setSecretKey(mail.getSecretKey());
+        mai.setPublicKey(mail.getPublicKey());
+        mai.setPrivateKey(mail.getPrivateKey());
+        mai.setEmailExpediteur(mail.getEmailExpediteur());
+        mai.setStatut(mail.getStatut());
+        mai.setObjet(mail.getObjet());
+        mai.setUtilisateur(mai.getUtilisateur());
+        mailRepo.save(mai);
+        MailDto mailDto = new MailDto();
+        mailDto.setId(mail.getId());
+        mailDto.setObject(mail.getObjet());
+        mailDto.setContent(decryptedMessage);
+        mailDto.setDate(mail.getDate());
+        mailDto.setEmailExpediteur(mail.getEmailExpediteur());
+        mailDto.setStatut(mail.getStatut());
+        mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
+
+        return mailDto;
+    }
+
+    public String deleteMail(Long id) {
         if (!mailRepo.existsById(id)) {
             throw new NotFoundException("Aucun mail avec l'id : " + id + "n'a ete trouve");
         }
         mailRepo.deleteById(id);
-        throw new Exception("Mail supprimer");
+        return "Mail supprimer";
     }
 
     public String deleteAllMailUser(Long id) throws Exception {
@@ -128,6 +193,6 @@ public class MailService {
             }
         }
         mailRepo.deleteAll(mailList);
-        throw new RuntimeException("Suppresion reussi");
+        return "Suppresion reussi";
     }
 }
