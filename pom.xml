@@ -100,11 +100,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<dependencies>
-					<dependency>
+					<!--<dependency>
 						<groupId>org.ow2.asm</groupId>
 						<artifactId>asm</artifactId>
 						<version>9.5</version>
-					</dependency>
+					</dependency>-->
 				</dependencies>
 			</plugin>
 		</plugins>
