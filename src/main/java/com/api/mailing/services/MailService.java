@@ -61,6 +61,7 @@ public class MailService {
             mail.setSecretKey(encrypted.getSecretKey());
             mail.setEmailExpediteur(utilisateur.getEmail());
             mail.setContent(encryptedMessage);
+            mail.setStatut(STATUT.envoyer);
         }
 
         mailRepo.save(mail);
@@ -96,6 +97,7 @@ public class MailService {
                 }else {
                     throw new Exception("Mail corrompu");
                 }
+                mail.setStatut(STATUT.recu);
                 MailDto mailDto = new MailDto();
                 mailDto.setId(mail.getId());
                 mailDto.setObject(mail.getObjet());
@@ -105,6 +107,7 @@ public class MailService {
                 mailDto.setStatut(mail.getStatut());
                 mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
                 mailDtoList.add(mailDto);
+                mailRepo.save(mail);
             }
         }
         return mailDtoList;
