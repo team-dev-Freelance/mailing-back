@@ -18,6 +18,6 @@ public class MailDto {
     private String object;
     private String content;
     private STATUT statut;
-    private List<String> urlsJointPieces;
+    private String urlsJointPieces;
     private Date date;
 }
