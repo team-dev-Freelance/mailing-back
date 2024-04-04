@@ -31,8 +31,8 @@ public class MailService {
         this.utilisateurRepo = utilisateurRepo;
     }
 
-    public MailDto sendMail(Long id, Mail mail) throws Exception {
-        Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
+    public MailDto sendMail(Mail mail) throws Exception {
+        Utilisateur utilisateur = utilisateurRepo.findByEmail(mail.getEmailExpediteur()).orElse(null);
         if (utilisateur == null){
             throw new NotFoundException("L'expediteur du mail est inconnu");
         }else if (utilisateur.getActive().equals(false)){
@@ -61,6 +61,7 @@ public class MailService {
             mail.setSecretKey(encrypted.getSecretKey());
             mail.setEmailExpediteur(utilisateur.getEmail());
             mail.setContent(encryptedMessage);
+            mail.setStatut(STATUT.envoyer);
         }
 
         mailRepo.save(mail);
@@ -96,6 +97,7 @@ public class MailService {
                 }else {
                     throw new Exception("Mail corrompu");
                 }
+                mail.setStatut(STATUT.recu);
                 MailDto mailDto = new MailDto();
                 mailDto.setId(mail.getId());
                 mailDto.setObject(mail.getObjet());
@@ -105,6 +107,7 @@ public class MailService {
                 mailDto.setStatut(mail.getStatut());
                 mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
                 mailDtoList.add(mailDto);
+                mailRepo.save(mail);
             }
         }
         return mailDtoList;
@@ -118,12 +121,32 @@ public class MailService {
         if (mailRepo.findAll().isEmpty()){
             throw new NotFoundException("Aucun enregistrement dans la base de donnees");
         }
-        if (boiteDeReception(id).isEmpty()){
+        if (mailRepo.findAll().isEmpty()){
             throw new NotFoundException("Aucun enregistrement dans la base de donnees");
         }
         List<MailDto> mailDtoList = new ArrayList<>();
-        for (MailDto mailDto:  boiteDeReception(id)){
-            if (mailDto.getStatut().equals(statut)){
+        for (Mail mail: mailRepo.findAll()){
+            Utilisateur user = utilisateurRepo.findById(mail.getUtilisateur().getId()).orElse(null);
+            if (user.getEmail().equals(utilisateur.getEmail()) && mail.getStatut().equals(statut)){
+                String decryptedMessage = "";
+
+                PrivateKey privateKey = KeyEncryption.decryptPrivateKey(mail.getPrivateKey());
+                PublicKey publicKey = KeyEncryption.decryptPublicKey(mail.getPublicKey());
+                boolean isValid = MailSignature.verifySignature(mail.getContent(), mail.getSignature(), publicKey);
+                if (!isValid){
+                    ChiffrementService chiffrementService = new ChiffrementService();
+                    decryptedMessage = chiffrementService.decryptContent(mail.getContent(), mail.getSecretKey(), privateKey);
+                }else {
+                    throw new Exception("Mail corrompu");
+                }
+                MailDto mailDto = new MailDto();
+                mailDto.setId(mail.getId());
+                mailDto.setObject(mail.getObjet());
+                mailDto.setContent(decryptedMessage);
+                mailDto.setDate(mail.getDate());
+                mailDto.setEmailExpediteur(mail.getEmailExpediteur());
+                mailDto.setStatut(mail.getStatut());
+                mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
                 mailDtoList.add(mailDto);
             }
         }
@@ -131,6 +154,36 @@ public class MailService {
             throw new NotFoundException("Aucun enregistrement dans la base de donnees");
         }
         return mailDtoList;
+    }
+
+    public MailDto editStatutMail(Long id, STATUT statut) throws Exception {
+        Mail mail = mailRepo.findById(id).orElse(null);
+        if (mail == null){
+            throw new NotFoundException("Aucun mail avec l'id: "+id+" dans la base de donnee");
+        }
+        mail.setStatut(statut);
+        mailRepo.save(mail);
+        String decryptedMessage = "";
+
+        PrivateKey privateKey = KeyEncryption.decryptPrivateKey(mail.getPrivateKey());
+        PublicKey publicKey = KeyEncryption.decryptPublicKey(mail.getPublicKey());
+        boolean isValid = MailSignature.verifySignature(mail.getContent(), mail.getSignature(), publicKey);
+        if (!isValid){
+            ChiffrementService chiffrementService = new ChiffrementService();
+            decryptedMessage = chiffrementService.decryptContent(mail.getContent(), mail.getSecretKey(), privateKey);
+        }else {
+            throw new Exception("Mail corrompu");
+        }
+        MailDto mailDto = new MailDto();
+        mailDto.setId(mail.getId());
+        mailDto.setObject(mail.getObjet());
+        mailDto.setContent(decryptedMessage);
+        mailDto.setDate(mail.getDate());
+        mailDto.setEmailExpediteur(mail.getEmailExpediteur());
+        mailDto.setStatut(statut);
+        mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
+
+        return mailDto;
     }
 
     public MailDto editMail(Long id, Mail mail) throws Exception {

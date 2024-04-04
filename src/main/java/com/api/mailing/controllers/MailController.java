@@ -1,14 +1,19 @@
 package com.api.mailing.controllers;
 
 import com.api.mailing.dto.MailDto;
+import com.api.mailing.dto.RequestMail;
 import com.api.mailing.entities.Mail;
 import com.api.mailing.entities.STATUT;
+import com.api.mailing.repositories.UtilisateurRepo;
 import com.api.mailing.services.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
 @RestController
@@ -17,16 +22,39 @@ import java.util.List;
 public class MailController {
 
     private MailService mailService;
+    private UtilisateurRepo utilisateurRepo;
 
     @Autowired
-    public MailController(MailService mailService) {
+    public MailController(MailService mailService, UtilisateurRepo utilisateurRepo) {
         this.mailService = mailService;
+        this.utilisateurRepo = utilisateurRepo;
     }
 
-    @PostMapping("/add/{id}")
-    public ResponseEntity<MailDto> sendMail(@PathVariable Long id, @RequestBody Mail mail) throws Exception {
-        return new ResponseEntity<>(mailService.sendMail(id, mail), HttpStatus.OK);
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MailDto> sendMail(RequestMail request) throws Exception {
+
+        Mail mail = new Mail();
+        String dir = System.getProperty("user.dir");
+        String url = dir+"/src/main/resources/assets/"+request.getFile().getOriginalFilename();
+        mail.setUrlJointPieces(url);
+        mail.setContent(request.getContent());
+        mail.setObjet(request.getObjet());
+        mail.setEmailExpediteur(request.getEmailExpediteur());
+        mail.setUtilisateur(utilisateurRepo.findById(request.getUserId()).orElse(null));
+        File convertFile = new File(url);
+        convertFile.createNewFile();
+        try(FileOutputStream out = new FileOutputStream(convertFile)){
+            out.write(request.getFile().getBytes());
+        }catch (Exception exe){
+            exe.printStackTrace();
+        }
+        return new ResponseEntity<>(mailService.sendMail(mail), HttpStatus.OK);
     }
+
+//    @PostMapping("/add/{id}")
+//    public ResponseEntity<MailDto> sendMail(@PathVariable Long id, @RequestBody Mail mail) throws Exception {
+//        return new ResponseEntity<>(mailService.sendMail(id, mail), HttpStatus.OK);
+//    }
 
     @GetMapping("/boite/{id}")
     public ResponseEntity<List<MailDto>> getEmailListByUser(@PathVariable Long id) throws Exception {
@@ -46,6 +74,11 @@ public class MailController {
     @PutMapping("/update/{id}")
     public ResponseEntity<MailDto> updateMail(@PathVariable Long id, @RequestBody Mail mail) throws Exception {
         return new ResponseEntity<>(mailService.editMail(id, mail), HttpStatus.OK);
+    }
+
+    @PutMapping("/updateStatut/{id}/statut")
+    public ResponseEntity<MailDto> updateStatutMail(@PathVariable Long id, @RequestParam STATUT statut) throws Exception {
+        return new ResponseEntity<>(mailService.editStatutMail(id, statut), HttpStatus.OK);
     }
 
 //    @DeleteMapping("/mail/deleteMailSelect")

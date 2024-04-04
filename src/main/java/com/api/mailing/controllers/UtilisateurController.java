@@ -2,6 +2,7 @@ package com.api.mailing.controllers;
 
 import com.api.mailing.dto.Password;
 import com.api.mailing.dto.UtilisateurDto;
+import com.api.mailing.entities.Role;
 import com.api.mailing.entities.Utilisateur;
 import com.api.mailing.services.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,11 @@ public class UtilisateurController {
     @GetMapping("/findByEmail")
     public ResponseEntity<UtilisateurDto> getUserByEmail(@RequestParam("email") String email){
         return new ResponseEntity<>(utilisateurService.getByEmail(email), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/findByRole")
+    public ResponseEntity<List<UtilisateurDto>> getUserByRole(@RequestParam("role") Role role){
+        return new ResponseEntity<>(utilisateurService.getAllUserByRole(role), HttpStatus.OK);
     }
 
     @GetMapping("/user/changePassword/{id}")

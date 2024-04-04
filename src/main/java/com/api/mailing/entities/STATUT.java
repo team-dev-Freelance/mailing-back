@@ -4,5 +4,6 @@ public enum STATUT {
     lu,
     brouillon,
     envoyer,
-    important
+    important,
+    recu
 }

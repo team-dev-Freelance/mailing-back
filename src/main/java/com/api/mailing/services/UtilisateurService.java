@@ -1,6 +1,7 @@
 package com.api.mailing.services;
 
 import com.api.mailing.dto.UtilisateurDto;
+import com.api.mailing.entities.Role;
 import com.api.mailing.entities.Utilisateur;
 import com.api.mailing.exceptions.NotFoundException;
 import com.api.mailing.repositories.UtilisateurRepo;
@@ -113,6 +114,28 @@ public class UtilisateurService {
         utilisateur.setPassword(encodedPassword);
         utilisateurRepo.save(utilisateur);
         throw new Exception("Modification effectuee avec succes");
+    }
+
+    public List<UtilisateurDto> getAllUserByRole(Role role){
+        if (utilisateurRepo.findAll().isEmpty()){
+            throw new NotFoundException("Aucun enregistrement dans la base de donnee");
+        }
+        List<UtilisateurDto> utilisateurDtoList = new ArrayList<>();
+        for (Utilisateur utilisateur: utilisateurRepo.findAll()){
+            if (utilisateur.getRole().equals(role)){
+                UtilisateurDto utilisateurDto = new UtilisateurDto();
+                utilisateurDto.setActive(utilisateur.getActive());
+                utilisateurDto.setRole(utilisateur.getRole());
+                utilisateurDto.setEmail(utilisateurDto.getEmail());
+                utilisateurDto.setNom(utilisateur.getUsername());
+                utilisateurDto.setId(utilisateur.getId());
+                utilisateurDtoList.add(utilisateurDto);
+            }
+        }
+        if (utilisateurDtoList.isEmpty()){
+            throw new NotFoundException("Aucun enregistrement dans la base de donnee");
+        }
+        return utilisateurDtoList;
     }
 
     private boolean containsLetterAndDigit(String str) {
