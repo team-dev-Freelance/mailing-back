@@ -34,20 +34,23 @@ public class MailController {
     public ResponseEntity<MailDto> sendMail(RequestMail request) throws Exception {
 
         Mail mail = new Mail();
-        String dir = System.getProperty("user.dir");
-        String url = dir+"/src/main/resources/assets/"+request.getFile().getOriginalFilename();
-        mail.setUrlJointPieces(url);
+        if (!request.getFile().isEmpty()){
+            String dir = System.getProperty("user.dir");
+            String url = dir+"/src/main/resources/assets/"+request.getFile().getOriginalFilename();
+            mail.setUrlJointPieces(url);
+            File convertFile = new File(url);
+            convertFile.createNewFile();
+            try(FileOutputStream out = new FileOutputStream(convertFile)){
+                out.write(request.getFile().getBytes());
+            }catch (Exception exe){
+                exe.printStackTrace();
+            }
+        }
         mail.setContent(request.getContent());
         mail.setObjet(request.getObjet());
         mail.setEmailExpediteur(request.getEmailExpediteur());
         mail.setUtilisateur(utilisateurRepo.findById(request.getUserId()).orElse(null));
-        File convertFile = new File(url);
-        convertFile.createNewFile();
-        try(FileOutputStream out = new FileOutputStream(convertFile)){
-            out.write(request.getFile().getBytes());
-        }catch (Exception exe){
-            exe.printStackTrace();
-        }
+
         return new ResponseEntity<>(mailService.sendMail(mail), HttpStatus.OK);
     }
 
