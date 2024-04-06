@@ -30,8 +30,8 @@ public class MailController {
         this.utilisateurRepo = utilisateurRepo;
     }
 
-    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MailDto> sendMail(RequestMail request) throws Exception {
+    @PostMapping("/add")
+    public ResponseEntity<MailDto> sendMail(@ModelAttribute RequestMail request) throws Exception {
 
         Mail mail = new Mail();
         if (!request.getFile().isEmpty()){
@@ -63,7 +63,17 @@ public class MailController {
     public ResponseEntity<List<MailDto>> getEmailListByUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.boiteDeReception(id), HttpStatus.OK);
     }
+    /*************************************************************************************************/
+    @GetMapping("/boiteenvoi/{id}")
+    public ResponseEntity<List<MailDto>> boiteReception(@PathVariable Long id) throws Exception {
+        return new ResponseEntity<>(mailService.boiteEnvoi(id), HttpStatus.OK);
+    }
 
+    @GetMapping("/boitelu/{id}")
+    public ResponseEntity<List<MailDto>> boitelu(@PathVariable Long id) throws Exception {
+        return new ResponseEntity<>(mailService.boiteEnvoi(id), HttpStatus.OK);
+    }
+    /*************************************************************************************************/
     @GetMapping("/findByStatut/{id}/statut")
     public ResponseEntity<List<MailDto>> getEmailListByStatut(@PathVariable Long id, @RequestParam STATUT statut) throws Exception {
         return new ResponseEntity<>(mailService.getListMailByStatut(id, statut), HttpStatus.OK);
@@ -79,7 +89,7 @@ public class MailController {
         return new ResponseEntity<>(mailService.editMail(id, mail), HttpStatus.OK);
     }
 
-    @PutMapping("/updateStatut/{id}/statut")
+    @GetMapping("/updateStatut/{id}/statut")
     public ResponseEntity<MailDto> updateStatutMail(@PathVariable Long id, @RequestParam STATUT statut) throws Exception {
         return new ResponseEntity<>(mailService.editStatutMail(id, statut), HttpStatus.OK);
     }

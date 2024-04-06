@@ -52,7 +52,7 @@ public class SecurityConfiguration {
                                                                 "/webjars/**",
                                                                 "/swagger-ui.html")
                                                 .permitAll()
-                                                .requestMatchers("/api/v1/admin/**").hasAnyRole(ADMIN.name())
+                                                /*.requestMatchers("/api/v1/admin/**").hasAnyRole(ADMIN.name())
                                                 .requestMatchers("/api/v1/user/**")
                                                 .hasAnyRole(ADMIN.name(), USER.name())
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/user/**")
@@ -63,7 +63,8 @@ public class SecurityConfiguration {
                                                 .hasAnyAuthority(ADMIN_UPDATE.name(), USER_UPDATE.name())
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/user/**")
                                                 .hasAnyAuthority(ADMIN_DELETE.name(), USER_DELETE.name())
-                                                .anyRequest().authenticated())
+                                                .anyRequest().authenticated())*/
+                                        .anyRequest().permitAll())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
