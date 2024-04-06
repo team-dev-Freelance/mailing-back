@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,7 +110,50 @@ public class MailService {
         }
         return mailDtoList;
     }
+    /**
+     *
+     * BOITE D'ENVOI
+     *
+     *
+     * ***/
+    public List<MailDto> boiteEnvoi(Long id) throws Exception {
+        Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
+        //        String password = "koire@0312";
+        if (utilisateur == null){
+            throw new NotFoundException("Aucun compte avec l'id : " + id + "n'a ete trouve");
+        }
+        List<MailDto> mailDtoList = new ArrayList<>();
+        for (Mail mail : mailRepo.findAll()){
+            // Utilisateur user = utilisateurRepo.findByEmail(mail.getUtilisateur().getEmail()).orElse(null);
+            if (mail.getEmailExpediteur().equals(utilisateur.getEmail())){
+                String decryptedMessage = "";
 
+                PrivateKey privateKey = KeyEncryption.decryptPrivateKey(mail.getPrivateKey());
+                PublicKey publicKey = KeyEncryption.decryptPublicKey(mail.getPublicKey());
+                boolean isValid = MailSignature.verifySignature(mail.getContent(), mail.getSignature(), publicKey);
+                if (!isValid){
+                    ChiffrementService chiffrementService = new ChiffrementService();
+                    decryptedMessage = chiffrementService.decryptContent(mail.getContent(), mail.getSecretKey(), privateKey);
+                }
+                else {
+                    throw new Exception("Mail corrompu");
+                }
+                mail.setStatut(STATUT.envoyer);
+                MailDto mailDto = new MailDto();
+                mailDto.setId(mail.getId());
+                mailDto.setObject(mail.getObjet());
+                mailDto.setContent(decryptedMessage);
+                mailDto.setDate(mail.getDate());
+                mailDto.setEmailExpediteur(mail.getEmailExpediteur());
+                mailDto.setStatut(mail.getStatut());
+                mailDto.setUrlsJointPieces(mail.getUrlJointPieces());
+                mailDtoList.add(mailDto);
+                mailRepo.save(mail);
+            }
+        }
+        return mailDtoList;
+    }
+    /*************************************************************************************************/
     public List<MailDto> getListMailByStatut(Long id, STATUT statut) throws Exception {
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
         if (utilisateur == null){
