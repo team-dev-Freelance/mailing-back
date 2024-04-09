@@ -110,21 +110,33 @@ public class MailService {
         }
         return mailDtoList;
     }
-    /**
-     *
-     * BOITE D'ENVOI
-     *
-     *
-     * ***/
+//<<<<<<< HEAD
+//    /**
+//     *
+//     * BOITE D'ENVOI
+//     *
+//     *
+//     * ***/
+//    public List<MailDto> boiteEnvoi(Long id) throws Exception {
+//        Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
+//        //        String password = "koire@0312";
+//=======
+///**
+// *
+// * BOITE D'ENVOI
+// *
+// *
+// * ***/
     public List<MailDto> boiteEnvoi(Long id) throws Exception {
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
-        //        String password = "koire@0312";
+    //        String password = "koire@0312";
         if (utilisateur == null){
             throw new NotFoundException("Aucun compte avec l'id : " + id + "n'a ete trouve");
         }
         List<MailDto> mailDtoList = new ArrayList<>();
         for (Mail mail : mailRepo.findAll()){
             // Utilisateur user = utilisateurRepo.findByEmail(mail.getUtilisateur().getEmail()).orElse(null);
+           // Utilisateur user = utilisateurRepo.findByEmail(mail.getUtilisateur().getEmail()).orElse(null);
             if (mail.getEmailExpediteur().equals(utilisateur.getEmail())){
                 String decryptedMessage = "";
 
