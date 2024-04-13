@@ -53,11 +53,6 @@ public class MailController {
         return new ResponseEntity<>(mailService.sendMail(mail), HttpStatus.OK);
     }
 
-//    @PostMapping("/add/{id}")
-//    public ResponseEntity<MailDto> sendMail(@PathVariable Long id, @RequestBody Mail mail) throws Exception {
-//        return new ResponseEntity<>(mailService.sendMail(id, mail), HttpStatus.OK);
-//    }
-
     @GetMapping("/boite/{id}")
     public ResponseEntity<List<MailDto>> getEmailListByUser(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(mailService.boiteDeReception(id), HttpStatus.OK);
