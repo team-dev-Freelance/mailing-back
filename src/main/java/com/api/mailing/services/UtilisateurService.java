@@ -23,23 +23,26 @@ public class UtilisateurService {
         this.utilisateurRepo = utilisateurRepo;
     }
 
-//    public UtilisateurDto addUser(Utilisateur utilisateur){
-//        if (utilisateur == null){
-//            throw new NotFoundException("Veuillez remplir toutes les informations");
-//        }
-//        if (!EmailValidator.isValidEmail(utilisateur.getEmail())){
-//            throw new RuntimeException("L'adresse mail n'est pas valide");
-//        }
-////        utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
-//        utilisateur.setPassword(utilisateur.getPassword());
-//        Utilisateur user = utilisateurRepo.save(utilisateur);
-//        UtilisateurDto utilisateurDto = new UtilisateurDto();
-//        utilisateurDto.setId(utilisateur.getId());
-//        utilisateurDto.setNom(utilisateur.getUsername());
-//        utilisateurDto.setEmail(utilisateur.getEmail());
-//        utilisateurDto.setActive(user.getActive());
-//        return utilisateurDto;
-//    }
+    public UtilisateurDto addUser(Utilisateur utilisateur){
+        if (utilisateur == null){
+            throw new NotFoundException("Veuillez remplir toutes les informations");
+        }
+        if (!EmailValidator.isValidEmail(utilisateur.getEmail())){
+            throw new RuntimeException("L'adresse mail n'est pas valide");
+        }
+        if (utilisateur.getActive().equals(null)){
+            utilisateur.setActive(true);
+        }
+//        utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
+        utilisateur.setPassword(utilisateur.getPassword());
+        Utilisateur user = utilisateurRepo.save(utilisateur);
+        UtilisateurDto utilisateurDto = new UtilisateurDto();
+        utilisateurDto.setId(utilisateur.getId());
+        utilisateurDto.setNom(utilisateur.getUsername());
+        utilisateurDto.setEmail(utilisateur.getEmail());
+        utilisateurDto.setActive(user.getActive());
+        return utilisateurDto;
+    }
 
     public UtilisateurDto getById(Long id){
         Utilisateur utilisateur = utilisateurRepo.findById(id).orElse(null);
